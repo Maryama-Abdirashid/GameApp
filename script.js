@@ -59,3 +59,20 @@ restartBtn.addEventListener("click", () => {
     guessInput.value = "";
     restartBtn.style.display = "none";
 });
+
+// Marka bogga la raro, xogta booqashada u dir backend
+window.addEventListener('load', () => {
+    const ip = 'unknown'; // Browser ma soo qaadi karo IP toos ah
+    const userAgent = navigator.userAgent;
+
+    fetch('http://127.0.0.1:5000/api/visit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ip: ip, user_agent: userAgent })
+    })
+    .then(response => response.json())
+    .then(data => console.log('Visit logged:', data))
+    .catch(error => console.error('Error logging visit:', error));
+});
