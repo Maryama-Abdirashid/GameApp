@@ -4,78 +4,77 @@
 
 # app = Flask(__name__)
 
-# # Function to connect to SQL Server - bedel xogta hoos ku qoran
 # def get_db_connection():
-    
-#     conn = pyodbc.connect(
-#         'DRIVER={ODBC Driver 17 for SQL Server};'
-#         'SERVER=MARYAMA-ABDIRAS\\SQLEXPRESS;'
-#         'DATABASE=GameDB;'
-#         'Trusted_Connection=yes;'
-#         'TrustServerCertificate=yes;'
-#     )
-#     return conn
+#     try:
+#         conn = pyodbc.connect(
+#             'DRIVER={ODBC Driver 17 for SQL Server};'
+#             'SERVER=MARYAMA-ABDIRAS\\SQLEXPRESS;'
+#             'DATABASE=GameDB;'
+#             'Trusted_Connection=yes;'
+#             'TrustServerCertificate=yes;'
+#         )
+#         return conn
+#     except Exception as e:
+#         print("Error connecting to database:", e)
+#         return None
 
+# # API to save visitor info
+# @app.route('/api/visit', methods=['POST'])
+# def save_visit():
+#     data = request.get_json()
+#     ip = data.get('ip')
+#     user_agent = data.get('user_agent')
+#     visit_time = datetime.now()
 
-# # Create visitors table haddii uusan jirin
-# def init_db():
 #     conn = get_db_connection()
-#     cursor = conn.cursor()
-#     cursor.execute('''
-#         IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'visitors')
-#         BEGIN
-#             CREATE TABLE visitors (
-#                 id INT IDENTITY(1,1) PRIMARY KEY,
-#                 ip NVARCHAR(50),
-#                 user_agent NVARCHAR(255),
-#                 visit_time DATETIME
-#             )
-#         END
-#     ''')
-#     conn.commit()
-#     conn.close()
+#     if not conn:
+#         return jsonify({'status': 'error', 'message': 'DB connection failed'}), 500
 
-# init_db()
+#     try:
+#         cursor = conn.cursor()
+#         cursor.execute('''
+#             INSERT INTO visitors (ip, user_agent, visit_time) VALUES (?, ?, ?)
+#         ''', (ip, user_agent, visit_time))
+#         conn.commit()
+#         return jsonify({'status': 'success'}), 201
+#     except Exception as e:
+#         print("Error saving visitor:", e)
+#         return jsonify({'status': 'error', 'message': str(e)}), 500
+#     finally:
+#         conn.close()
 
-# def save_visitor(ip, user_agent):
+# # API to get all visitors
+# @app.route('/api/visitors', methods=['GET'])
+# def get_visitors():
 #     conn = get_db_connection()
-#     cursor = conn.cursor()
-#     cursor.execute('''
-#         INSERT INTO visitors (ip, user_agent, visit_time) VALUES (?, ?, ?)
-#     ''', (ip, user_agent, datetime.now()))
-#     conn.commit()
-#     conn.close()
+#     if not conn:
+#         return jsonify({'status': 'error', 'message': 'DB connection failed'}), 500
 
+#     try:
+#         cursor = conn.cursor()
+#         cursor.execute('SELECT ip, user_agent, visit_time FROM visitors ORDER BY visit_time DESC')
+#         rows = cursor.fetchall()
+#         visitors_list = []
+#         for row in rows:
+#             visitors_list.append({
+#                 'ip': row[0],
+#                 'user_agent': row[1],
+#                 'visit_time': row[2].strftime('%Y-%m-%d %H:%M:%S')
+#             })
+#         return jsonify(visitors_list)
+#     except Exception as e:
+#         print("Error fetching visitors:", e)
+#         return jsonify({'status': 'error', 'message': str(e)}), 500
+#     finally:
+#         conn.close()
+
+# # Optional: home route to test server running
 # @app.route('/')
 # def index():
-#     ip = request.remote_addr
-#     user_agent = request.headers.get('User-Agent')
-#     save_visitor(ip, user_agent)
-#     return render_template('index.html')
-
-# @app.route('/visitors')
-# def visitors():
-#     conn = get_db_connection()
-#     cursor = conn.cursor()
-#     cursor.execute('SELECT ip, user_agent, visit_time FROM visitors ORDER BY id DESC')
-#     rows = cursor.fetchall()
-#     conn.close()
-#     visitors_list = []
-#     for row in rows:
-#         visitors_list.append({
-#             'ip': row[0],
-#             'user_agent': row[1],
-#             'visit_time': row[2].strftime('%Y-%m-%d %H:%M:%S')
-#         })
-#     return jsonify(visitors_list)
-
-
+#     return "Server is running. Use API endpoints to save or get visitors."
 
 # if __name__ == '__main__':
-#     init_db()
 #     app.run(debug=True)
-
-
 from flask import Flask, request, jsonify
 import pyodbc
 from datetime import datetime
@@ -83,15 +82,20 @@ from datetime import datetime
 app = Flask(__name__)
 
 def get_db_connection():
-    conn = pyodbc.connect(
-        'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=MARYAMA-ABDIRAS\\SQLEXPRESS;'
-        'DATABASE=GameDB;'
-        'Trusted_Connection=yes;'
-        'TrustServerCertificate=yes;'
-    )
-    return conn
+    try:
+        conn = pyodbc.connect(
+            'DRIVER={ODBC Driver 17 for SQL Server};'
+            'SERVER=MARYAMA-ABDIRAS\\SQLEXPRESS;'
+            'DATABASE=GameDB;'
+            'Trusted_Connection=yes;'
+            'TrustServerCertificate=yes;'
+        )
+        return conn
+    except Exception as e:
+        print("Error connecting to database:", e)
+        return None
 
+# Save visitor info
 @app.route('/api/visit', methods=['POST'])
 def save_visit():
     data = request.get_json()
@@ -100,14 +104,96 @@ def save_visit():
     visit_time = datetime.now()
 
     conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO visitors (ip, user_agent, visit_time) VALUES (?, ?, ?)
-    ''', (ip, user_agent, visit_time))
-    conn.commit()
-    conn.close()
+    if not conn:
+        return jsonify({'status': 'error', 'message': 'DB connection failed'}), 500
 
-    return jsonify({'status': 'success'}), 201
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO visitors (ip, user_agent, visit_time) VALUES (?, ?, ?)
+        ''', (ip, user_agent, visit_time))
+        conn.commit()
+        return jsonify({'status': 'success'}), 201
+    except Exception as e:
+        print("Error saving visitor:", e)
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    finally:
+        conn.close()
+
+# Get all visitors
+@app.route('/api/visitors', methods=['GET'])
+def get_visitors():
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'status': 'error', 'message': 'DB connection failed'}), 500
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute('SELECT ip, user_agent, visit_time FROM visitors ORDER BY visit_time DESC')
+        rows = cursor.fetchall()
+        visitors_list = []
+        for row in rows:
+            visitors_list.append({
+                'ip': row[0],
+                'user_agent': row[1],
+                'visit_time': row[2].strftime('%Y-%m-%d %H:%M:%S')
+            })
+        return jsonify(visitors_list)
+    except Exception as e:
+        print("Error fetching visitors:", e)
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    finally:
+        conn.close()
+
+# Save game score
+@app.route('/api/game_score', methods=['POST'])
+def save_game_score():
+    data = request.get_json()
+    player_name = data.get('player_name')
+    score = data.get('score')
+    play_time = datetime.now()
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'status': 'error', 'message': 'DB connection failed'}), 500
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO game_scores (player_name, score, play_time) VALUES (?, ?, ?)
+        ''', (player_name, score, play_time))
+        conn.commit()
+        return jsonify({'status': 'success'}), 201
+    except Exception as e:
+        print("Error saving game score:", e)
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    finally:
+        conn.close()
+
+# Get all game scores
+@app.route('/api/game_scores', methods=['GET'])
+def get_game_scores():
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'status': 'error', 'message': 'DB connection failed'}), 500
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute('SELECT player_name, score, play_time FROM game_scores ORDER BY play_time DESC')
+        rows = cursor.fetchall()
+        scores_list = []
+        for row in rows:
+            scores_list.append({
+                'player_name': row[0],
+                'score': row[1],
+                'play_time': row[2].strftime('%Y-%m-%d %H:%M:%S')
+            })
+        return jsonify(scores_list)
+    except Exception as e:
+        print("Error fetching game scores:", e)
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    finally:
+        conn.close()
 
 if __name__ == '__main__':
     app.run(debug=True)

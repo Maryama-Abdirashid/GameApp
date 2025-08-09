@@ -1,3 +1,88 @@
+/* body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #6dd5fa, #2980b9);
+    text-align: center;
+    padding: 50px 20px;
+    color: white;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-container {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 25px 20px;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 350px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+    box-sizing: border-box;
+}
+
+input {
+    padding: 12px;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: none;
+    text-align: center;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 12px 0;
+    margin-top: 15px;
+    border: none;
+    border-radius: 8px;
+    background: #27ae60;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: #2ecc71;
+}
+
+#message {
+    margin-top: 15px;
+    font-size: 18px;
+}
+
+#restartBtn {
+    background: #e74c3c;
+}
+
+#restartBtn:hover {
+    background: #c0392b;
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 30px 10px;
+    }
+
+    .game-container {
+        max-width: 100%;
+        padding: 20px 15px;
+    }
+
+    input, button {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    #message {
+        font-size: 16px;
+    }
+} */
+
 body {
     font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #6dd5fa, #2980b9);
@@ -63,15 +148,19 @@ button:hover {
     background: #c0392b;
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments for screens smaller than 480px */
 @media (max-width: 480px) {
     body {
         padding: 30px 10px;
+        min-height: auto;
+        display: block; /* so the content scrolls normally on small screens */
     }
 
     .game-container {
         max-width: 100%;
         padding: 20px 15px;
+        margin: 0 10px;
+        box-shadow: none; /* optional: remove shadow for better mobile performance */
     }
 
     input, button {

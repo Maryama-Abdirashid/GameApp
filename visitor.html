@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Visitors List</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; max-width: 700px; margin: auto; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #2980b9; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Visitors List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>IP Address</th>
+                <th>User Agent</th>
+                <th>Visit Time</th>
+            </tr>
+        </thead>
+        <tbody id="visitorsTableBody">
+        </tbody>
+    </table>
+
+    <script>
+        fetch('/api/visitors')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('visitorsTableBody');
+                tbody.innerHTML = ''; // Clear existing
+                data.forEach(visitor => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${visitor.ip}</td>
+                        <td>${visitor.user_agent}</td>
+                        <td>${visitor.visit_time}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(err => {
+                console.error('Error loading visitors:', err);
+                document.body.innerHTML = '<p>Error loading visitors list.</p>';
+            });
+    </script>
+</body>
+</html>
